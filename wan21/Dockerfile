@@ -1,7 +1,7 @@
 FROM videosdgx-base:latest AS base
 
 # Dependências específicas do Wan 2.1
-COPY requirements.txt /app/
+COPY wan21/requirements.txt /app/
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Copiar código comum

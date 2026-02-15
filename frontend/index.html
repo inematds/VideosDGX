@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideosDGX - Geração de Vídeos com IA</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 VideosDGX</h1>
+            <p class="subtitle">Geração de Vídeos com IA - DGX Spark 2026</p>
+        </header>
+
+        <!-- Status dos Modelos -->
+        <section class="models-status">
+            <h2>Status dos Modelos</h2>
+            <div class="status-grid" id="statusGrid">
+                <div class="status-card loading">
+                    <div class="status-indicator"></div>
+                    <h3>LTX-2</h3>
+                    <p class="model-desc">Vídeo + Áudio</p>
+                    <p class="model-status">Verificando...</p>
+                    <p class="model-memory">-</p>
+                </div>
+                <div class="status-card loading">
+                    <div class="status-indicator"></div>
+                    <h3>Wan 2.1</h3>
+                    <p class="model-desc">Versátil 14B</p>
+                    <p class="model-status">Verificando...</p>
+                    <p class="model-memory">-</p>
+                </div>
+                <div class="status-card loading">
+                    <div class="status-indicator"></div>
+                    <h3>MAGI-1</h3>
+                    <p class="model-desc">Vídeos Longos</p>
+                    <p class="model-status">Verificando...</p>
+                    <p class="model-memory">-</p>
+                </div>
+                <div class="status-card loading">
+                    <div class="status-indicator"></div>
+                    <h3>Waver 1.0</h3>
+                    <p class="model-desc">Batch Rápido</p>
+                    <p class="model-status">Verificando...</p>
+                    <p class="model-memory">-</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Formulário de Geração -->
+        <section class="generation-form">
+            <h2>Gerar Novo Vídeo</h2>
+            <form id="generateForm">
+                <div class="form-group">
+                    <label for="model">Modelo</label>
+                    <select id="model" name="model" required>
+                        <option value="">Selecione um modelo</option>
+                        <option value="ltx2">LTX-2 (Vídeo + Áudio)</option>
+                        <option value="wan21">Wan 2.1 (Versátil)</option>
+                        <option value="magi1">MAGI-1 (Vídeos Longos)</option>
+                        <option value="waver">Waver 1.0 (Rápido)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="prompt">Prompt (Descrição do Vídeo)</label>
+                    <textarea id="prompt" name="prompt" rows="4" required
+                        placeholder="Ex: A cat walking on a beach at sunset with waves in the background"></textarea>
+                    <small>Descreva o vídeo que você quer gerar</small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="duration">Duração (segundos)</label>
+                        <input type="number" id="duration" name="duration" value="5" min="1" max="60" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fps">FPS</label>
+                        <select id="fps" name="fps">
+                            <option value="24" selected>24</option>
+                            <option value="30">30</option>
+                            <option value="60">60</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="resolution">Resolução</label>
+                        <select id="resolution" name="resolution">
+                            <option value="512x512">512x512 (Rápido)</option>
+                            <option value="1024x576" selected>1024x576 (HD)</option>
+                            <option value="1920x1080">1920x1080 (Full HD)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="seed">Seed (opcional)</label>
+                        <input type="number" id="seed" name="seed" placeholder="42">
+                        <small>Para resultados reproduzíveis</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="guidance_scale">Guidance Scale</label>
+                    <input type="range" id="guidance_scale" name="guidance_scale"
+                        min="1" max="20" step="0.5" value="7.5">
+                    <span id="guidanceValue">7.5</span>
+                </div>
+
+                <button type="submit" class="btn-primary" id="generateBtn">
+                    🎬 Gerar Vídeo
+                </button>
+            </form>
+        </section>
+
+        <!-- Lista de Jobs -->
+        <section class="jobs-section">
+            <h2>Vídeos em Processamento</h2>
+            <div id="jobsList" class="jobs-list">
+                <p class="empty-message">Nenhum vídeo em processamento</p>
+            </div>
+        </section>
+
+        <!-- Vídeos Concluídos -->
+        <section class="completed-section">
+            <h2>Vídeos Concluídos</h2>
+            <div id="completedList" class="completed-list">
+                <p class="empty-message">Nenhum vídeo concluído ainda</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal de Loading -->
+    <div id="loadingModal" class="modal">
+        <div class="modal-content">
+            <div class="spinner"></div>
+            <p>Processando...</p>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

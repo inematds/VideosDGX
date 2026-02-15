@@ -1,7 +1,7 @@
 FROM videosdgx-base:latest AS base
 
 # Dependências específicas do Waver 1.0
-COPY requirements.txt /app/
+COPY waver/requirements.txt /app/
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Copiar código comum

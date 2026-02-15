@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  # Frontend Web UI (Demo Mode)
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    container_name: videosdgx-frontend-demo
+    ports:
+      - "8080:80"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - videosdgx
+
+networks:
+  videosdgx:
+    driver: bridge
+    name: videosdgx_network_demo

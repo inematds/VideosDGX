@@ -2,7 +2,7 @@
 FROM videosdgx-base:latest AS base
 
 # Dependências específicas do LTX-2
-COPY requirements.txt /app/
+COPY ltx2/requirements.txt /app/
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Copiar código comum

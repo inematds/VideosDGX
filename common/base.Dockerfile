@@ -20,9 +20,9 @@ RUN apt-get update && apt-get install -y \
 # Atualizar pip e setuptools
 RUN python3.11 -m pip install --upgrade pip setuptools wheel
 
-# PyTorch com suporte CUDA 12.3 (compatível com Blackwell)
+# PyTorch com suporte CUDA 12.1 (compatível com Blackwell)
 RUN pip install --no-cache-dir \
-    torch==2.2.0 \
+    torch==2.0.1 \
     torchvision \
     torchaudio \
     --index-url https://download.pytorch.org/whl/cu121
