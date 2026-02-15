@@ -79,31 +79,30 @@ case $choice in
     1)
         echo ""
         echo "=== Baixando LTX-2 ==="
-        # NOTA: IDs são hipotéticos - ajustar para IDs reais quando disponíveis
-        download_model "ltx2" "Lightricks/LTX-Video" "fp4"
+        download_model "ltx2" "Lightricks/LTX-2" "fp4"
         ;;
     2)
         echo ""
         echo "=== Baixando Wan 2.1 ==="
-        download_model "wan21" "Wan/Wan-2.1-14B" "fp8"
+        download_model "wan21" "Wan-AI/Wan2.1-T2V-14B" "fp8"
         ;;
     3)
         echo ""
         echo "=== Baixando MAGI-1 ==="
-        download_model "magi1" "MAGI/MAGI-1" "fp4"
+        download_model "magi1" "sand-ai/MAGI-1" "fp4"
         ;;
     4)
         echo ""
         echo "=== Baixando Waver 1.0 ==="
-        download_model "waver" "Waver/Waver-1.0" "fp8"
+        download_model "waver" "FoundationVision/Waver" "fp8"
         ;;
     5)
         echo ""
         echo "=== Baixando TODOS os modelos ==="
-        download_model "ltx2" "Lightricks/LTX-Video" "fp4"
-        download_model "wan21" "Wan/Wan-2.1-14B" "fp8"
-        download_model "magi1" "MAGI/MAGI-1" "fp4"
-        download_model "waver" "Waver/Waver-1.0" "fp8"
+        download_model "ltx2" "Lightricks/LTX-2" "fp4"
+        download_model "wan21" "Wan-AI/Wan2.1-T2V-14B" "fp8"
+        download_model "magi1" "sand-ai/MAGI-1" "fp4"
+        download_model "waver" "FoundationVision/Waver" "fp8"
         ;;
     0)
         echo "Saindo..."

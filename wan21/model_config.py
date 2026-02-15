@@ -37,8 +37,8 @@ def load_wan21_model(model_path: str, quantization: str = "fp8") -> Tuple[Any, A
         # Verificar se modelo existe
         model_path_obj = Path(model_path)
         if not model_path_obj.exists():
-            logger.warning(f"Modelo não encontrado em {model_path}")
-            model_id = "Wan/Wan-2.1-14B"  # ID hipotético
+            logger.warning(f"Modelo não encontrado em {model_path}, baixando do HuggingFace...")
+            model_id = "Wan-AI/Wan2.1-T2V-14B"  # ID oficial do HuggingFace
         else:
             model_id = str(model_path_obj)
 
