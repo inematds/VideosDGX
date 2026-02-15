@@ -1,9 +1,9 @@
 // Configuração dos modelos
 const MODELS = {
-    ltx2: { name: 'LTX-2', port: 8001, desc: 'Vídeo + Áudio' },
-    wan21: { name: 'Wan 2.1', port: 8002, desc: 'Versátil 14B' },
-    magi1: { name: 'MAGI-1', port: 8003, desc: 'Vídeos Longos' },
-    waver: { name: 'Waver 1.0', port: 8004, desc: 'Batch Rápido' }
+    ltx2: { name: 'LTX-2', apiPath: '/api/ltx2', desc: 'Vídeo + Áudio' },
+    wan21: { name: 'Wan 2.1', apiPath: '/api/wan21', desc: 'Versátil 14B' },
+    magi1: { name: 'MAGI-1', apiPath: '/api/magi1', desc: 'Vídeos Longos' },
+    waver: { name: 'Waver 1.0', apiPath: '/api/waver', desc: 'Batch Rápido' }
 };
 
 // Estado global
@@ -46,7 +46,7 @@ async function checkModelsStatus() {
         const card = cards[i];
 
         try {
-            const response = await fetch(`http://localhost:${model.port}/info`, {
+            const response = await fetch(`${model.apiPath}/info`, {
                 method: 'GET',
                 timeout: 5000
             });
@@ -121,7 +121,7 @@ async function handleGenerate(e) {
     btn.textContent = 'Enviando...';
 
     try {
-        const response = await fetch(`http://localhost:${model.port}/generate`, {
+        const response = await fetch(`${model.apiPath}/generate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -172,7 +172,7 @@ async function updateJobs() {
         const model = MODELS[job.model];
 
         try {
-            const response = await fetch(`http://localhost:${model.port}/jobs/${job.job_id}`);
+            const response = await fetch(`${model.apiPath}/jobs/${job.job_id}`);
 
             if (response.ok) {
                 const data = await response.json();
@@ -253,7 +253,7 @@ function renderCompletedJobs() {
 
     completedList.innerHTML = completedJobs.map(job => {
         const model = MODELS[job.model];
-        const downloadUrl = `http://localhost:${model.port}/jobs/${job.job_id}/download`;
+        const downloadUrl = `${model.apiPath}/jobs/${job.job_id}/download`;
 
         return `
             <div class="job-card">
