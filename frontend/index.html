@@ -17,30 +17,30 @@
         <section class="models-status">
             <h2>Status dos Modelos</h2>
             <div class="status-grid" id="statusGrid">
-                <div class="status-card loading">
+                <div class="status-card loading" data-model="ltx2">
                     <div class="status-indicator"></div>
-                    <h3>LTX-2</h3>
+                    <h3>LTX-2 <button class="help-btn" onclick="showModelInfo('ltx2')">ℹ️</button></h3>
                     <p class="model-desc">Vídeo + Áudio</p>
                     <p class="model-status">Verificando...</p>
                     <p class="model-memory">-</p>
                 </div>
-                <div class="status-card loading">
+                <div class="status-card loading" data-model="wan21">
                     <div class="status-indicator"></div>
-                    <h3>Wan 2.1</h3>
+                    <h3>Wan 2.1 <button class="help-btn" onclick="showModelInfo('wan21')">ℹ️</button></h3>
                     <p class="model-desc">Versátil 14B</p>
                     <p class="model-status">Verificando...</p>
                     <p class="model-memory">-</p>
                 </div>
-                <div class="status-card loading">
+                <div class="status-card loading" data-model="magi1">
                     <div class="status-indicator"></div>
-                    <h3>MAGI-1</h3>
+                    <h3>MAGI-1 <button class="help-btn" onclick="showModelInfo('magi1')">ℹ️</button></h3>
                     <p class="model-desc">Vídeos Longos</p>
                     <p class="model-status">Verificando...</p>
                     <p class="model-memory">-</p>
                 </div>
-                <div class="status-card loading">
+                <div class="status-card loading" data-model="waver">
                     <div class="status-indicator"></div>
-                    <h3>Waver 1.0</h3>
+                    <h3>Waver 1.0 <button class="help-btn" onclick="showModelInfo('waver')">ℹ️</button></h3>
                     <p class="model-desc">Batch Rápido</p>
                     <p class="model-status">Verificando...</p>
                     <p class="model-memory">-</p>
@@ -53,7 +53,10 @@
             <h2>Gerar Novo Vídeo</h2>
             <form id="generateForm">
                 <div class="form-group">
-                    <label for="model">Modelo</label>
+                    <label for="model">
+                        Modelo
+                        <button type="button" class="help-btn" onclick="showHelp('model')">ℹ️</button>
+                    </label>
                     <select id="model" name="model" required>
                         <option value="">Selecione um modelo</option>
                         <option value="ltx2">LTX-2 (Vídeo + Áudio)</option>
@@ -64,7 +67,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="prompt">Prompt (Descrição do Vídeo)</label>
+                    <label for="prompt">
+                        Prompt (Descrição do Vídeo)
+                        <button type="button" class="help-btn" onclick="showHelp('prompt')">ℹ️</button>
+                    </label>
                     <textarea id="prompt" name="prompt" rows="4" required
                         placeholder="Ex: A cat walking on a beach at sunset with waves in the background"></textarea>
                     <small>Descreva o vídeo que você quer gerar</small>
@@ -72,12 +78,18 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="duration">Duração (segundos)</label>
+                        <label for="duration">
+                            Duração (segundos)
+                            <button type="button" class="help-btn" onclick="showHelp('duration')">ℹ️</button>
+                        </label>
                         <input type="number" id="duration" name="duration" value="5" min="1" max="60" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="fps">FPS</label>
+                        <label for="fps">
+                            FPS
+                            <button type="button" class="help-btn" onclick="showHelp('fps')">ℹ️</button>
+                        </label>
                         <select id="fps" name="fps">
                             <option value="24" selected>24</option>
                             <option value="30">30</option>
@@ -88,7 +100,10 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="resolution">Resolução</label>
+                        <label for="resolution">
+                            Resolução
+                            <button type="button" class="help-btn" onclick="showHelp('resolution')">ℹ️</button>
+                        </label>
                         <select id="resolution" name="resolution">
                             <option value="512x512">512x512 (Rápido)</option>
                             <option value="1024x576" selected>1024x576 (HD)</option>
@@ -97,14 +112,20 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="seed">Seed (opcional)</label>
+                        <label for="seed">
+                            Seed (opcional)
+                            <button type="button" class="help-btn" onclick="showHelp('seed')">ℹ️</button>
+                        </label>
                         <input type="number" id="seed" name="seed" placeholder="42">
                         <small>Para resultados reproduzíveis</small>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="guidance_scale">Guidance Scale</label>
+                    <label for="guidance_scale">
+                        Guidance Scale
+                        <button type="button" class="help-btn" onclick="showHelp('guidance')">ℹ️</button>
+                    </label>
                     <input type="range" id="guidance_scale" name="guidance_scale"
                         min="1" max="20" step="0.5" value="7.5">
                     <span id="guidanceValue">7.5</span>
@@ -131,6 +152,15 @@
                 <p class="empty-message">Nenhum vídeo concluído ainda</p>
             </div>
         </section>
+    </div>
+
+    <!-- Modal de Ajuda -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content help-modal">
+            <span class="close-btn" onclick="closeHelp()">&times;</span>
+            <h2 id="helpTitle"></h2>
+            <div id="helpContent"></div>
+        </div>
     </div>
 
     <!-- Modal de Loading -->
