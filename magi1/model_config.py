@@ -57,15 +57,21 @@ def load_magi1_model(model_path: str, quantization: str = "fp4") -> Tuple[Any, A
         else:
             model_id = str(model_path_obj)
 
+        # Determinar device
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+
         # Carregar modelo autoregressive
         model = AutoModelForCausalLM.from_pretrained(
             model_id,
             torch_dtype=torch_dtype,
-            device_map="auto",
             quantization_config=quantization_config,
             use_safetensors=True,
             trust_remote_code=True  # MAGI pode ter código customizado
         )
+
+        # Mover para GPU (se não estiver usando quantização FP4)
+        if quantization != "fp4":  # FP4 já gerencia device automaticamente
+            model = model.to(device)
 
         # Carregar tokenizer (se aplicável)
         try:

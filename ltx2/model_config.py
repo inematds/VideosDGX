@@ -28,9 +28,9 @@ def load_ltx2_model(model_path: str, quantization: str = "fp4") -> Tuple[Any, An
         from diffusers import DiffusionPipeline
         from transformers import AutoModel, AutoTokenizer
 
-        # Configurações de quantização
+        # Configurações de quantização e device
         torch_dtype = torch.float16
-        device_map = "auto"
+        device = "cuda" if torch.cuda.is_available() else "cpu"
 
         if quantization == "fp4":
             # Quantização FP4 (NVFP4 no Blackwell)
@@ -70,11 +70,14 @@ def load_ltx2_model(model_path: str, quantization: str = "fp4") -> Tuple[Any, An
         pipeline = DiffusionPipeline.from_pretrained(
             model_id,
             torch_dtype=torch_dtype,
-            device_map=device_map,
             quantization_config=quantization_config if quantization == "fp4" else None,
             use_safetensors=True,
             variant="fp16" if quantization == "fp16" else None
         )
+
+        # Mover para GPU
+        if quantization != "fp4":  # FP4 já gerencia device automaticamente
+            pipeline = pipeline.to(device)
 
         # Otimizações específicas
         pipeline.enable_attention_slicing()

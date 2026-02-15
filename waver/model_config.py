@@ -42,14 +42,19 @@ def load_waver_model(model_path: str, quantization: str = "fp8") -> Tuple[Any, A
         else:
             model_id = str(model_path_obj)
 
+        # Determinar device
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+
         # Carregar pipeline lightweight
         pipeline = DiffusionPipeline.from_pretrained(
             model_id,
             torch_dtype=torch_dtype,
-            device_map="auto",
             use_safetensors=True,
             low_cpu_mem_usage=True  # Otimização para modelo lightweight
         )
+
+        # Mover para GPU
+        pipeline = pipeline.to(device)
 
         # Otimizações para batch processing
         pipeline.enable_attention_slicing()
