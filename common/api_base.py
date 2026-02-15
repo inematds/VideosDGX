@@ -2,6 +2,7 @@
 Framework base para APIs FastAPI dos modelos de vídeo
 """
 from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any, List
@@ -94,6 +95,15 @@ class VideoModelAPI:
             title=f"{model_name} Video Generation API",
             description=f"API para geração de vídeos usando {model_name}",
             version="1.0.0"
+        )
+
+        # Configurar CORS para permitir acesso do frontend
+        self.app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],  # Em produção, especifique domínios permitidos
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
         )
 
         self.jobs: Dict[str, Job] = {}
