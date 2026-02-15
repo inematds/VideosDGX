@@ -1,0 +1,9 @@
+# Dependências específicas para Waver 1.0
+# Modelo lightweight para batch generation
+
+# Efficient processing
+torchvision>=0.16.0
+timm>=0.9.0
+
+# Batch processing utilities
+tqdm>=4.66.0

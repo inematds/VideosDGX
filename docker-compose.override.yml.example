@@ -1,0 +1,42 @@
+# docker-compose.override.yml.example
+# Copie para docker-compose.override.yml e customize para desenvolvimento local
+#
+# cp docker-compose.override.yml.example docker-compose.override.yml
+
+version: '3.8'
+
+services:
+  ltx2:
+    # Desenvolvimento: mount código local para hot reload
+    volumes:
+      - ./common:/app/common:ro
+      - ./ltx2:/app/model:ro
+    environment:
+      # Modo debug
+      - LOG_LEVEL=DEBUG
+      # Desabilitar auto-unload em desenvolvimento
+      - AUTO_UNLOAD_MINUTES=0
+
+  wan21:
+    volumes:
+      - ./common:/app/common:ro
+      - ./wan21:/app/model:ro
+    environment:
+      - LOG_LEVEL=DEBUG
+      - AUTO_UNLOAD_MINUTES=0
+
+  magi1:
+    volumes:
+      - ./common:/app/common:ro
+      - ./magi1:/app/model:ro
+    environment:
+      - LOG_LEVEL=DEBUG
+      - AUTO_UNLOAD_MINUTES=0
+
+  waver:
+    volumes:
+      - ./common:/app/common:ro
+      - ./waver:/app/model:ro
+    environment:
+      - LOG_LEVEL=DEBUG
+      - AUTO_UNLOAD_MINUTES=0

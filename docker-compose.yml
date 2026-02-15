@@ -1,0 +1,159 @@
+version: '3.8'
+
+services:
+  # LTX-2: Full video + audio generation (FP4)
+  ltx2:
+    build:
+      context: .
+      dockerfile: ltx2/Dockerfile
+    container_name: videosdgx-ltx2
+    ports:
+      - "8001:8000"
+    volumes:
+      - models:/models
+      - outputs:/outputs
+    environment:
+      - MODEL_NAME=ltx2
+      - MODEL_PATH=/models/ltx2
+      - QUANTIZATION=fp4
+      - OUTPUT_DIR=/outputs
+      - AUTO_UNLOAD_MINUTES=${AUTO_UNLOAD_MINUTES:-0}
+      - CUDA_VISIBLE_DEVICES=0
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - videosdgx
+
+  # Wan 2.1: Versatile video generation (FP8)
+  wan21:
+    build:
+      context: .
+      dockerfile: wan21/Dockerfile
+    container_name: videosdgx-wan21
+    ports:
+      - "8002:8000"
+    volumes:
+      - models:/models
+      - outputs:/outputs
+    environment:
+      - MODEL_NAME=wan21
+      - MODEL_PATH=/models/wan21
+      - QUANTIZATION=fp8
+      - OUTPUT_DIR=/outputs
+      - AUTO_UNLOAD_MINUTES=${AUTO_UNLOAD_MINUTES:-0}
+      - CUDA_VISIBLE_DEVICES=0
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - videosdgx
+
+  # MAGI-1: Autoregressive model for long-form video (FP4)
+  magi1:
+    build:
+      context: .
+      dockerfile: magi1/Dockerfile
+    container_name: videosdgx-magi1
+    ports:
+      - "8003:8000"
+    volumes:
+      - models:/models
+      - outputs:/outputs
+    environment:
+      - MODEL_NAME=magi1
+      - MODEL_PATH=/models/magi1
+      - QUANTIZATION=fp4
+      - OUTPUT_DIR=/outputs
+      - AUTO_UNLOAD_MINUTES=${AUTO_UNLOAD_MINUTES:-0}
+      - CUDA_VISIBLE_DEVICES=0
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - videosdgx
+
+  # Waver 1.0: Lightweight model for batch generation (FP8)
+  waver:
+    build:
+      context: .
+      dockerfile: waver/Dockerfile
+    container_name: videosdgx-waver
+    ports:
+      - "8004:8000"
+    volumes:
+      - models:/models
+      - outputs:/outputs
+    environment:
+      - MODEL_NAME=waver
+      - MODEL_PATH=/models/waver
+      - QUANTIZATION=fp8
+      - OUTPUT_DIR=/outputs
+      - AUTO_UNLOAD_MINUTES=${AUTO_UNLOAD_MINUTES:-0}
+      - CUDA_VISIBLE_DEVICES=0
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - videosdgx
+
+volumes:
+  models:
+    driver: local
+    name: videosdgx_models
+  outputs:
+    driver: local
+    name: videosdgx_outputs
+
+networks:
+  videosdgx:
+    driver: bridge
+    name: videosdgx_network

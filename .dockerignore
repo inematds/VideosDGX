@@ -1,0 +1,46 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# IDEs
+.vscode
+.idea
+*.swp
+*.swo
+
+# Documentation
+doc/
+*.md
+!README.md
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Outputs
+outputs/
+*.mp4
+*.avi
+*.mov
+
+# Models (serão baixados separadamente)
+models/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/

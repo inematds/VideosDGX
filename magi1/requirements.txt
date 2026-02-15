@@ -1,0 +1,11 @@
+# Dependências específicas para MAGI-1
+# Modelo autoregressive para vídeos longos com contexto temporal
+
+# Autoregressive modeling
+flash-attn>=2.5.0
+
+# Video utilities
+moviepy>=1.0.3
+
+# Quantização
+bitsandbytes>=0.41.0
