@@ -29,31 +29,12 @@ def load_ltx2_model(model_path: str, quantization: str = "fp4") -> Tuple[Any, An
         from transformers import AutoModel, AutoTokenizer
 
         # Configurações de quantização e device
-        torch_dtype = torch.float16
         device = "cuda" if torch.cuda.is_available() else "cpu"
 
-        if quantization == "fp4":
-            # Quantização FP4 (NVFP4 no Blackwell)
-            from transformers import BitsAndBytesConfig
-
-            quantization_config = BitsAndBytesConfig(
-                load_in_4bit=True,
-                bnb_4bit_compute_dtype=torch.float16,
-                bnb_4bit_use_double_quant=True,
-                bnb_4bit_quant_type="nf4"
-            )
-
-            logger.info("Usando quantização FP4 (NF4)")
-
-        elif quantization == "fp8":
-            torch_dtype = torch.float8_e4m3fn
-            quantization_config = None
-            logger.info("Usando quantização FP8")
-
-        else:
-            torch_dtype = torch.float16
-            quantization_config = None
-            logger.info("Usando FP16 (sem quantização)")
+        # Por enquanto, usar FP16 até configurar quantização específica do LTX-2
+        torch_dtype = torch.float16
+        quantization_config = None
+        logger.info(f"Usando FP16 (quantização {quantization} não implementada ainda para DiffusionPipeline)")
 
         # Verificar se modelo existe
         model_path_obj = Path(model_path)
@@ -68,14 +49,11 @@ def load_ltx2_model(model_path: str, quantization: str = "fp4") -> Tuple[Any, An
         pipeline = DiffusionPipeline.from_pretrained(
             model_id,
             torch_dtype=torch_dtype,
-            quantization_config=quantization_config if quantization == "fp4" else None,
-            use_safetensors=True,
-            variant="fp16" if quantization == "fp16" else None
+            use_safetensors=True
         )
 
         # Mover para GPU
-        if quantization != "fp4":  # FP4 já gerencia device automaticamente
-            pipeline = pipeline.to(device)
+        pipeline = pipeline.to(device)
 
         # Otimizações específicas
         pipeline.enable_attention_slicing()

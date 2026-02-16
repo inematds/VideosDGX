@@ -176,7 +176,12 @@ async function updateJobs() {
 
             if (response.ok) {
                 const data = await response.json();
-                const updatedJob = { ...job, ...data };
+                // Preservar informações originais do modelo
+                const updatedJob = {
+                    ...data,
+                    model: job.model,
+                    modelName: job.modelName
+                };
 
                 if (data.status === 'completed') {
                     // Mover para concluídos
