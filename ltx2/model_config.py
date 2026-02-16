@@ -25,8 +25,13 @@ def load_ltx2_model(model_path: str, quantization: str = "fp4") -> Tuple[Any, An
     logger.info(f"Carregando LTX-2 de {model_path} com quantização {quantization}")
 
     try:
-        from diffusers import DiffusionPipeline
-        from transformers import AutoModel, AutoTokenizer
+        # Importar LTX2Pipeline do pacote oficial
+        try:
+            from ltx2 import LTX2Pipeline
+            logger.info("Usando LTX2Pipeline do pacote oficial ltx2")
+        except ImportError:
+            from diffusers import DiffusionPipeline as LTX2Pipeline
+            logger.warning("LTX2Pipeline não encontrado, usando DiffusionPipeline genérico")
 
         # Configurações de quantização e device
         device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -56,9 +61,8 @@ def load_ltx2_model(model_path: str, quantization: str = "fp4") -> Tuple[Any, An
         else:
             model_id = str(model_path_obj)
 
-        # Carregar pipeline de difusão
-        # NOTA: Este é um exemplo genérico. O LTX-2 pode ter sua própria classe de pipeline
-        pipeline = DiffusionPipeline.from_pretrained(
+        # Carregar pipeline LTX-2
+        pipeline = LTX2Pipeline.from_pretrained(
             model_id,
             torch_dtype=torch_dtype,
             use_safetensors=True
