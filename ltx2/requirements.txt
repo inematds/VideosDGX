@@ -1,7 +1,12 @@
-# Dependências simplificadas para LTX-2
-# Video/Image
+# Dependências para LTX-2
+# Full video + audio generation
+
+# LTX-2 official package from GitHub
+git+https://github.com/Lightricks/LTX-2.git
+
+# Video/Image processing
 imageio>=2.33.0
 imageio-ffmpeg>=0.4.9
 
-# Quantização FP4
+# Quantização
 bitsandbytes>=0.41.0

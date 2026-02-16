@@ -38,7 +38,19 @@ def load_ltx2_model(model_path: str, quantization: str = "fp4") -> Tuple[Any, An
 
         # Verificar se modelo existe
         model_path_obj = Path(model_path)
-        if not model_path_obj.exists():
+
+        # Verificar estrutura de cache do HuggingFace
+        hf_cache_path = model_path_obj / "models--Lightricks--LTX-2" / "snapshots"
+        if hf_cache_path.exists():
+            # Pegar o último snapshot
+            snapshots = list(hf_cache_path.iterdir())
+            if snapshots:
+                model_id = str(snapshots[0])
+                logger.info(f"Usando modelo do cache HuggingFace: {model_id}")
+            else:
+                logger.warning(f"Cache vazio em {hf_cache_path}")
+                model_id = "Lightricks/LTX-2"
+        elif not model_path_obj.exists():
             logger.warning(f"Modelo não encontrado em {model_path}, baixando do HuggingFace...")
             model_id = "Lightricks/LTX-2"  # ID oficial do HuggingFace
         else:
