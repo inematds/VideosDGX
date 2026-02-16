@@ -11,6 +11,33 @@ Este projeto fornece uma arquitetura Docker multi-container para executar 4 mode
 - **MAGI-1**: Modelo autoregressive para vídeos longos (FP4, ~20-25GB)
 - **Waver 1.0**: Modelo leve para batch generation (FP8, ~15-18GB)
 
+## 🎯 Status Atual (2026-02-16)
+
+### ✅ Funcionando
+
+- ✅ **Docker Containers**: Todos os 4 containers (ltx2, wan21, magi1, waver) estão UP e respondendo
+- ✅ **APIs REST**: Endpoints /health retornando status saudável em todas as portas (8001-8004)
+- ✅ **Job Submission**: Jobs de geração de vídeo aceitos com sucesso por todos os modelos
+- ✅ **Modelos Baixados**:
+  - LTX-2: 293GB completo (checkpoint 41GB + Gemma FP8 6GB + projections 2.7GB + audio VAE 208MB)
+  - Wan 2.1: 65GB completo (modelo montado de 6 shards)
+  - MAGI-1: Download em andamento
+  - Waver: Disponível no Docker volume
+
+### ⚠️ Issues Conhecidos
+
+1. **LTX-2**: Carregamento iniciou mas travou em 50% (4/8 shards) - possível timeout ou OOM
+2. **Wan 2.1 & Waver**: Erro `torch.xpu` AttributeError durante inicialização (relacionado a ARM64 + CUDA)
+3. **MAGI-1**: Erro de configuração - falta `model_type` no config.json
+4. **CUDA Memory**: Sistema host com 117GB/120GB VRAM já alocados, impedindo testes locais
+
+### 📁 Scripts de Teste Disponíveis
+
+- `generate_all_videos.py`: Submete jobs de geração para todos os 4 modelos simultaneamente
+- `check_jobs_status.py`: Monitora status dos jobs em loop (10s de intervalo, 10min timeout)
+- `test_ltx2_direct.py`: Testa LTX-2 via API Python direta (ltx_pipelines)
+- `test_ltx2_cpu.py`: Teste de fallback em CPU (extremamente lento)
+
 ### Características
 
 - ✅ Isolamento por container (controle granular)
@@ -314,6 +341,77 @@ Resposta:
 }
 ```
 
+## 🔄 Abordagens Alternativas
+
+Além da arquitetura Docker, este projeto inclui duas abordagens alternativas configuradas:
+
+### ComfyUI (Recomendado pela NVIDIA)
+
+ComfyUI está instalado e configurado com custom nodes para LTX-2:
+
+```bash
+# Ativar ambiente
+source comfyui-env/bin/activate
+
+# Iniciar servidor (requer resolver issue de memória)
+cd ComfyUI
+python main.py --port 8188
+
+# Acessar: http://localhost:8188
+```
+
+**Localização dos modelos ComfyUI**:
+- Checkpoint: `ComfyUI/models/checkpoints/ltx-2-19b-distilled.safetensors` (41GB)
+- Text Encoder: `ComfyUI/models/clip/gemma_3_12B_it_fp8_e4m3fn.safetensors` (6GB)
+- Projections: `ComfyUI/models/clip/ltx-2-19b-dev-fp4_projections_only.safetensors` (2.7GB)
+- Audio VAE: `ComfyUI/models/vae/LTX2_audio_vae_bf16.safetensors` (208MB)
+
+**Custom Nodes**:
+- ComfyUI-LTXVideo (oficial Lightricks)
+- MAGI-1 (SandAI-org)
+
+### Python API Direta (LTX-2)
+
+API oficial da Lightricks instalada via pip:
+
+```bash
+# Ativar ambiente
+source comfyui-env/bin/activate
+
+# Gerar vídeo via linha de comando
+python -m ltx_pipelines.distilled \
+  --checkpoint-path ComfyUI/models/checkpoints/ltx-2-19b-distilled.safetensors \
+  --gemma-root ComfyUI/models/clip/ \
+  --prompt "A cat walking on a beach at sunset" \
+  --output-path output.mp4 \
+  --num-frames 65 \
+  --height 512 \
+  --width 768 \
+  --num-inference-steps 8 \
+  --guidance-scale 3.0
+```
+
+**Pacotes instalados**:
+- `ltx-core`
+- `ltx-pipelines`
+
+## 🧪 Testes Realizados
+
+### Geração de Vídeos (16/02/2026)
+
+Executado `generate_all_videos.py` com prompt: *"A cat walking on a beach at sunset, cinematic camera movement, golden hour lighting, 4k quality"*
+
+**Resultados**:
+
+| Modelo | Status | Job ID | Detalhes |
+|--------|--------|--------|----------|
+| LTX-2 | ⏸️ Travado | ltx2-26252c62 | Carregamento iniciou (50%), depois timeout |
+| Wan 2.1 | ❌ Falhou | wan21-66eb1181 | torch.xpu AttributeError |
+| MAGI-1 | ❌ Falhou | magi1-5d8c2647 | Config.json sem model_type |
+| Waver | ❌ Falhou | waver-cf98097a | torch.xpu AttributeError |
+
+**Log completo**: `generation_results.log`
+
 ## 🛠️ Comandos Úteis
 
 ### Docker Compose
@@ -421,31 +519,173 @@ docker-compose restart ltx2
 3. Verificar métricas: `curl http://localhost:8001/metrics`
 4. Ajustar número de inference steps nas configs
 
+### ⚠️ Erros Conhecidos e Soluções
+
+#### 1. torch.xpu AttributeError (Wan 2.1, Waver)
+
+**Erro**:
+```
+AttributeError: module 'torch' has no attribute 'xpu'
+```
+
+**Causa**: Bibliotecas tentando detectar Intel XPU em ambiente ARM64 + CUDA
+
+**Soluções tentadas**:
+- ❌ Environment variables (`ACCELERATE_USE_XPU=0`)
+- ❌ Monkey-patching `torch.xpu`
+- ⏳ **Solução necessária**: Patch no código de inicialização dos containers
+
+**Workaround temporário**:
+```python
+# Adicionar antes de imports de diffusers/accelerate
+import torch
+if not hasattr(torch, 'xpu'):
+    class DummyXPU:
+        @staticmethod
+        def is_available(): return False
+    torch.xpu = DummyXPU()
+```
+
+#### 2. CUDA Out of Memory (Sistema Host)
+
+**Erro**:
+```
+RuntimeError: CUDA out of memory. Tried to allocate X GB
+(GPU 0; 120.00 GiB total capacity; 117.00 GiB already allocated)
+```
+
+**Causa**: Processo root (PID 2351379) consumindo 117GB/120GB VRAM
+
+**Solução**:
+```bash
+# Requer sudo
+sudo kill -9 2351379
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+nvidia-smi
+```
+
+**Verificação**:
+```bash
+# Mostrar processos usando GPU
+fuser -v /dev/nvidia*
+ps aux | grep 2351379
+```
+
+#### 3. MAGI-1 Config Missing
+
+**Erro**:
+```
+Unrecognized model in /models/magi1. Should have a `model_type` key in its config.json
+```
+
+**Causa**: Download incompleto ou configuração ausente
+
+**Solução**:
+```bash
+# Verificar integridade do download
+docker exec videosdgx-magi1 ls -lah /models/magi1/
+docker exec videosdgx-magi1 cat /models/magi1/config.json
+
+# Re-download se necessário
+docker exec videosdgx-magi1 huggingface-cli download SandAI-org/MAGI-1 --local-dir /models/magi1
+```
+
+#### 4. LTX-2 Loading Timeout
+
+**Sintoma**: Carregamento trava em 50% (4/8 checkpoint shards)
+
+**Diagnóstico**:
+```bash
+# Verificar logs detalhados
+docker logs videosdgx-ltx2 --tail 200
+
+# Verificar uso de memória durante carregamento
+docker stats videosdgx-ltx2
+
+# Verificar se processo está travado ou apenas lento
+docker exec videosdgx-ltx2 ps aux
+```
+
+**Possíveis causas**:
+- OOM durante carregamento de shards grandes
+- Deadlock em carregamento multi-threaded
+- Timeout muito curto nas requisições
+
+**Solução**:
+```bash
+# Aumentar timeout no check_jobs_status.py
+max_iterations = 120  # 20 minutos ao invés de 10
+
+# Ou restart do container
+docker-compose restart ltx2
+```
+
+#### 5. Gemma Model Gated (resolvido)
+
+**Erro**: `403 Client Error: Forbidden for url: google/gemma-3-12b-it`
+
+**Solução aplicada**: Usar modelo alternativo não-gated
+```bash
+# Baixado: GitMylo/LTX-2-comfy_gemma_fp8_e4m3fn
+# Localização: ComfyUI/models/clip/gemma_3_12B_it_fp8_e4m3fn.safetensors
+```
+
 ## 📚 Estrutura de Arquivos
 
 ```
 VideosDGX/
-├── common/                 # Código compartilhado
-│   ├── base.Dockerfile    # Base image com CUDA + PyTorch
-│   ├── api_base.py        # Framework FastAPI
-│   ├── model_loader.py    # Gerenciador de modelos
-│   └── utils.py           # Utilidades (logging, metrics)
-├── ltx2/                  # LTX-2 específico
+├── common/                    # Código compartilhado (Docker)
+│   ├── base.Dockerfile        # Base image com CUDA + PyTorch
+│   ├── api_base.py            # Framework FastAPI
+│   ├── model_loader.py        # Gerenciador de modelos
+│   └── utils.py               # Utilidades (logging, metrics)
+├── ltx2/                      # LTX-2 container específico
 │   ├── Dockerfile
 │   ├── app.py
 │   ├── model_config.py
 │   └── requirements.txt
-├── wan21/                 # Wan 2.1 específico
-├── magi1/                 # MAGI-1 específico
-├── waver/                 # Waver 1.0 específico
-├── scripts/               # Scripts de utilidade
+├── wan21/                     # Wan 2.1 container
+├── magi1/                     # MAGI-1 container
+├── waver/                     # Waver container
+├── scripts/                   # Scripts de utilidade
 │   ├── download_models.sh
 │   ├── health_check.py
 │   └── benchmark.py
-├── docker-compose.yml     # Orquestração
-├── .env                   # Configurações
-├── .dockerignore
-└── README.md
+├── ComfyUI/                   # ComfyUI installation
+│   ├── models/
+│   │   ├── checkpoints/       # LTX-2 checkpoint (41GB)
+│   │   ├── clip/              # Gemma FP8 encoder (6GB) + projections (2.7GB)
+│   │   └── vae/               # Audio VAE (208MB)
+│   └── custom_nodes/
+│       ├── ComfyUI-LTXVideo/  # LTX-2 custom node
+│       └── MAGI-1/            # MAGI-1 custom node
+├── LTX-2/                     # Repositório oficial Lightricks
+│   └── src/ltx_pipelines/     # API Python direta
+├── comfyui-env/               # Python venv (PyTorch 2.10.0+cu130)
+├── docker-compose.yml         # Orquestração dos 4 containers
+├── .env                       # Configurações de ambiente
+├── generate_all_videos.py    # Script de teste - submete jobs para todos os modelos
+├── check_jobs_status.py      # Script de monitoramento de jobs
+├── test_ltx2_direct.py        # Teste LTX-2 via Python API
+├── test_ltx2_cpu.py           # Teste LTX-2 em CPU (fallback)
+├── generation_results.log     # Log dos testes executados
+├── CLAUDE.md                  # Instruções para Claude Code
+├── ARCHITECTURE.md            # Documentação da arquitetura
+├── QUICKSTART.md              # Guia rápido de início
+├── PROJECT_SUMMARY.md         # Resumo do projeto
+├── CHANGELOG.md               # Histórico de mudanças
+└── README.md                  # Este arquivo
+```
+
+**Volumes Docker**:
+```
+videosdgx_models/
+├── ltx2/           # 293GB - Repositório completo HuggingFace
+├── wan21/          # 65GB  - Modelo Wan 2.1 completo
+├── magi1/          # Em download
+└── waver/          # Modelo Waver 1.0
+
+videosdgx_outputs/  # Vídeos gerados pelos containers
 ```
 
 ## 🔐 Segurança

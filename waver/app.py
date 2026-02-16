@@ -1,6 +1,15 @@
 """
 API FastAPI para Waver 1.0 Video Generation
 """
+# Patch torch.xpu BEFORE any other imports to avoid XPU detection errors
+import torch
+if not hasattr(torch, 'xpu'):
+    # Create dummy xpu module to prevent AttributeError
+    class DummyXPU:
+        def is_available(self): return False
+        def device_count(self): return 0
+    torch.xpu = DummyXPU()
+
 import os
 from pathlib import Path
 import sys

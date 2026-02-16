@@ -46,11 +46,13 @@ def load_waver_model(model_path: str, quantization: str = "fp8") -> Tuple[Any, A
         device = "cuda" if torch.cuda.is_available() else "cpu"
 
         # Carregar pipeline lightweight
+        # Explicitly disable device_map to avoid torch.xpu errors
         pipeline = DiffusionPipeline.from_pretrained(
             model_id,
             torch_dtype=torch_dtype,
             use_safetensors=True,
-            low_cpu_mem_usage=True  # Otimização para modelo lightweight
+            low_cpu_mem_usage=True,  # Otimização para modelo lightweight
+            device_map=None  # Prevent auto device detection
         )
 
         # Mover para GPU
@@ -67,7 +69,9 @@ def load_waver_model(model_path: str, quantization: str = "fp8") -> Tuple[Any, A
         return pipeline, pipeline
 
     except Exception as e:
+        import traceback
         logger.error(f"Erro ao carregar Waver 1.0: {str(e)}")
+        logger.error(f"Traceback completo:\n{traceback.format_exc()}")
         raise
 
 

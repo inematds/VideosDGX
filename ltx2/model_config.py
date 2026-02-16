@@ -25,13 +25,9 @@ def load_ltx2_model(model_path: str, quantization: str = "fp4") -> Tuple[Any, An
     logger.info(f"Carregando LTX-2 de {model_path} com quantização {quantization}")
 
     try:
-        # Importar LTX2Pipeline do pacote oficial
-        try:
-            from ltx2 import LTX2Pipeline
-            logger.info("Usando LTX2Pipeline do pacote oficial ltx2")
-        except ImportError:
-            from diffusers import DiffusionPipeline as LTX2Pipeline
-            logger.warning("LTX2Pipeline não encontrado, usando DiffusionPipeline genérico")
+        # Importar LTXPipeline do diffusers (suporte nativo)
+        from diffusers.pipelines.ltx import LTXPipeline
+        logger.info("Usando LTXPipeline do diffusers")
 
         # Configurações de quantização e device
         device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -61,8 +57,8 @@ def load_ltx2_model(model_path: str, quantization: str = "fp4") -> Tuple[Any, An
         else:
             model_id = str(model_path_obj)
 
-        # Carregar pipeline LTX-2
-        pipeline = LTX2Pipeline.from_pretrained(
+        # Carregar pipeline LTX
+        pipeline = LTXPipeline.from_pretrained(
             model_id,
             torch_dtype=torch_dtype,
             use_safetensors=True
@@ -77,6 +73,18 @@ def load_ltx2_model(model_path: str, quantization: str = "fp4") -> Tuple[Any, An
         if torch.cuda.is_available():
             # Otimizações para Blackwell
             pipeline.enable_model_cpu_offload()  # Aproveitar memória unificada
+
+        # Patch para compatibilidade: transformer não aceita rope_interpolation_scale
+        # Fazer monkey-patch da classe do transformer para aceitar e ignorar esse parâmetro
+        import types
+        transformer_class = pipeline.transformer.__class__
+        original_forward = transformer_class.forward
+
+        def patched_forward(self, *args, rope_interpolation_scale=None, **kwargs):
+            # Ignorar rope_interpolation_scale se presente
+            return original_forward(self, *args, **kwargs)
+
+        transformer_class.forward = patched_forward
 
         logger.info("LTX-2 carregado com sucesso")
 

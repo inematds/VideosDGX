@@ -26,6 +26,7 @@ venv/
 ENV/
 env/
 .venv
+comfyui-env/
 
 # IDEs
 .vscode/
@@ -52,6 +53,11 @@ outputs/
 
 # Models (grandes demais para git)
 models/
+
+# Large cloned repositories (not part of this project)
+ComfyUI/
+LTX-2/
+dgx-spark-playbooks/
 
 # Logs
 *.log

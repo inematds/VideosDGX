@@ -5,6 +5,13 @@ FROM videosdgx-base:latest AS base
 COPY ltx2/requirements.txt /app/
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
+# Instalar diffusers dev version com suporte LTX-2
+RUN pip install --no-cache-dir git+https://github.com/huggingface/diffusers.git
+
+# Copiar e aplicar patch no pipeline LTX para video-only generation
+COPY ltx2/patch_pipeline.py /tmp/
+RUN python3 /tmp/patch_pipeline.py
+
 # Copiar código comum
 COPY common/utils.py /app/
 COPY common/model_loader.py /app/
