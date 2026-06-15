@@ -522,7 +522,7 @@ const MODEL_PRESETS = {
   wan22_14b: [
     { label:'480P · 2s',  w:832,  h:480, f:33,  cfg:3.5, steps:30, split:15 },
     { label:'720P · 2.4s',w:1280, h:704, f:57,  cfg:3.5, steps:30, split:15 },
-    { label:'720P · 5s',  w:1280, h:720, f:121, cfg:3.5, steps:30, split:15 },
+    { label:'720P · 5s',  w:1280, h:720, f:81, cfg:3.5, steps:30, split:15 },  // 14B MoE: max 81 frames @ 16fps (acima = artefatos)
   ],
   wan22_5b: [
     { label:'480P · 2s',  w:720,  h:480, f:33,  cfg:6.0, steps:20, split:10 },
