@@ -20,7 +20,7 @@ echo ""
 echo "3️⃣ Reiniciando ComfyUI..."
 cd /home/nmaldaner/projetos/VideosDGX/ComfyUI
 source ../comfyui-env/bin/activate
-nohup python main.py --listen 0.0.0.0 --port 8188 > ../comfyui_server.log 2>&1 &
+nohup python main.py --listen 0.0.0.0 --port 8188 --highvram > ../comfyui_server.log 2>&1 &
 COMFYUI_PID=$!
 
 sleep 3

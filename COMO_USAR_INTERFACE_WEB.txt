@@ -1,0 +1,65 @@
+╔══════════════════════════════════════════════════════════════╗
+║      🌐 INTERFACE WEB - GUIA RÁPIDO DE 30 SEGUNDOS          ║
+╚══════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────┐
+│ 1️⃣  INICIAR A INTERFACE                                     │
+└──────────────────────────────────────────────────────────────┘
+
+cd /home/nmaldaner/projetos/VideosDGX
+./iniciar_interface_web.sh
+
+┌──────────────────────────────────────────────────────────────┐
+│ 2️⃣  ABRIR NO NAVEGADOR                                      │
+└──────────────────────────────────────────────────────────────┘
+
+http://localhost:7860
+
+┌──────────────────────────────────────────────────────────────┐
+│ 3️⃣  GERAR SEU PRIMEIRO VÍDEO                                │
+└──────────────────────────────────────────────────────────────┘
+
+1. Clique em "⚡ Rápido" (preset)
+2. Digite: "Um gato caminhando na praia"
+3. Clique em "🚀 Gerar Vídeo"
+4. Aguarde ~77 segundos
+5. Assista o vídeo na própria interface!
+
+┌──────────────────────────────────────────────────────────────┐
+│ ✨ RECURSOS DA INTERFACE                                     │
+└──────────────────────────────────────────────────────────────┘
+
+✅ Design bonito e moderno (gradiente roxo/azul)
+✅ Presets rápidos (Rápido, HD, Longo, Qualidade)
+✅ Player de vídeo integrado
+✅ Lista de todos os vídeos gerados
+✅ Status em tempo real (atualização automática)
+✅ Barra de progresso animada
+✅ Funciona em celular (responsivo)
+✅ Estimativa de tempo automática
+
+┌──────────────────────────────────────────────────────────────┐
+│ 🎯 ACESSAR DE OUTRO COMPUTADOR                               │
+└──────────────────────────────────────────────────────────────┘
+
+# Descobrir IP do DGX:
+hostname -I | awk '{print $1}'
+
+# Acessar de outro PC:
+http://[IP-DO-DGX]:7860
+
+┌──────────────────────────────────────────────────────────────┐
+│ 🛑 PARAR A INTERFACE                                         │
+└──────────────────────────────────────────────────────────────┘
+
+Pressione Ctrl+C no terminal
+
+┌──────────────────────────────────────────────────────────────┐
+│ 📚 DOCUMENTAÇÃO COMPLETA                                     │
+└──────────────────────────────────────────────────────────────┘
+
+Ver arquivo: INTERFACE_WEB.md
+
+╔══════════════════════════════════════════════════════════════╗
+║  PRONTO PARA USAR! Abra http://localhost:7860 🚀            ║
+╚══════════════════════════════════════════════════════════════╝

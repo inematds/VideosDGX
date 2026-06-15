@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 # Configuração padrão
-COMFYUI_API = "http://localhost:8188/api/prompt"
+COMFYUI_API = "http://localhost:8188/prompt"
 OUTPUT_DIR = Path("/home/nmaldaner/projetos/VideosDGX/ComfyUI/output")
 GEMMA_PATH = "gemma-3-12b-it-qat-q4_0-unquantized/model-00001-of-00005.safetensors"
 LTX_PATH = "ltx-2-19b-distilled.safetensors"

@@ -53,6 +53,12 @@ outputs/
 
 # Models (grandes demais para git)
 models/
+*.safetensors
+*.ckpt
+*.pth
+*.pt
+*.gguf
+*.onnx
 
 # Large cloned repositories (not part of this project)
 ComfyUI/

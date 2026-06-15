@@ -1,0 +1,135 @@
+═══════════════════════════════════════════════════════════════
+🎬 QUICK START - LTX-2 Video Generation
+═══════════════════════════════════════════════════════════════
+
+╔═══════════════════════════════════════════════════════════╗
+║  STATUS: ✅ OPERACIONAL - Primeiro vídeo gerado!          ║
+║  Data: 16/02/2026                                         ║
+╚═══════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 GERAR VÍDEO (COMANDO MAIS SIMPLES)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+cd /home/nmaldaner/projetos/VideosDGX
+./gerar_video_ltx2.py "Seu prompt aqui"
+
+Exemplo:
+./gerar_video_ltx2.py "Gato andando na praia ao pôr do sol"
+
+Output:
+ComfyUI/output/ltx2_video_*.mp4
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 OPÇÕES PRINCIPAIS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Resolução HD:
+./gerar_video_ltx2.py "prompt" --width 1024 --height 576
+
+Vídeo longo (5s):
+./gerar_video_ltx2.py "prompt" --frames 121
+
+Alta fidelidade ao prompt:
+./gerar_video_ltx2.py "prompt" --cfg 5.0
+
+Seed específica:
+./gerar_video_ltx2.py "prompt" --seed 12345
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⏱️  TEMPOS DE GERAÇÃO (APROXIMADOS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+512x512,  2s (49 frames)  →  ~77s
+1024x576, 2s (49 frames)  →  ~150s
+512x512,  5s (121 frames) →  ~190s
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📂 ARQUIVOS IMPORTANTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Script principal:
+  gerar_video_ltx2.py
+
+Documentação:
+  RESUMO_EXECUTIVO.md         ← Comece por aqui!
+  README_GERAR_VIDEOS.md       ← Guia de uso
+  PRIMEIRO_VIDEO_SUCESSO.md    ← Detalhes técnicos
+
+Vídeos gerados:
+  ComfyUI/output/
+
+Logs:
+  comfyui_server.log
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔍 MONITORAMENTO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Log em tempo real:
+  tail -f comfyui_server.log
+
+Listar vídeos:
+  ls -lht ComfyUI/output/ | head -10
+
+Interface web:
+  http://localhost:8188
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 DICAS DE PROMPTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ BOM:
+  "Astronaut floating in space, slow rotation, Earth in
+   background, cinematic lighting, 4k quality"
+
+❌ RUIM:
+  "astronaut"  ← Muito simples, falta contexto
+
+ESTRUTURA IDEAL:
+  [SUJEITO] + [AÇÃO] + [CENÁRIO] + [ESTILO] + [QUALIDADE]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️  PROBLEMAS COMUNS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Erro: "Prompt é obrigatório"
+  Solução: Sempre passe um prompt entre aspas
+
+Vídeo não segue prompt:
+  Solução: Aumente --cfg (ex: --cfg 5.0)
+
+Geração muito lenta:
+  Solução: Reduza resolução (--width 512 --height 512)
+
+Vídeo muito curto:
+  Solução: Aumente frames (--frames 121 para 5s)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✨ CONFIGURAÇÃO ATUAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Hardware:  DGX Spark 2026 (128GB RAM, GB10 Blackwell)
+Modelo:    LTX-2 19B Distilled (~39GB)
+Encoder:   Gemma 3 12B QAT (~22.7GB)
+Total:     ~65GB em disco
+
+Capacidades:
+  ✅ Text-to-video com áudio
+  ✅ 512x512 até 1920x1080
+  ✅ 2s até 10s+ de duração
+  ✅ 24-30 FPS configurável
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎉 PRIMEIRO VÍDEO GERADO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Arquivo: PRIMEIRO_VIDEO_LTX2_OFICIAL_00001_.mp4
+Data:    16/02/2026 12:53
+Specs:   512x512, 49 frames, 24fps, 2.04s
+Prompt:  "A red ball bouncing on white background,
+          simple smooth animation, 4k quality"
+
+═══════════════════════════════════════════════════════════════
+Última atualização: 16/02/2026 12:56
+═══════════════════════════════════════════════════════════════

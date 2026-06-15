@@ -2,6 +2,42 @@
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
+## [4.2] - 2026-02-18 — Interface Web: Fila de Jobs + Cancelamento
+
+### ✨ Novidades
+
+- **Fila de jobs ilimitada**: Múltiplos jobs podem ser submetidos sem bloqueio. O botão "Gerar Vídeo" fica sempre habilitado.
+- **Novo status `queued`**: Ciclo de vida completo: `queued → processing → completed/error`.
+- **Thread worker sequencial**: Thread daemon única (`queue_worker`) processa jobs um a um via `queue.Queue`.
+- **Cancelamento de jobs**: Endpoint `POST /api/cancel/{job_id}` cancela jobs na fila (imediato) ou em processamento (no próximo ciclo de polling, ≤5s).
+- **Posição na fila**: `/api/jobs` retorna `queue_position` para jobs em estado `queued`.
+- **Botão ✕ Cancelar**: Aparece nos cards de jobs com status `queued` ou `processing`.
+- **Indicador visual**: Status `queued` exibido em roxo/índigo com posição na fila.
+- **Contador na sidebar**: Mostra quantos jobs estão na fila e quantos estão processando.
+
+### 📁 Arquivos
+
+| Arquivo | Descrição |
+|---------|-----------|
+| `web_interface_v4_2.py` | Interface principal v4.2 |
+| `iniciar_interface_web_v4_2.sh` | Script de inicialização |
+
+### 🔧 Detalhes Técnicos
+
+- **Porta**: 7862 (v4=7860, v4.1=7861, v4.2=7862)
+- **Jobs file**: `/tmp/dgx_jobs_v4_2.json`
+- **Logo**: `DGX ▶ v4.2`
+- **Cancelamento em processamento**: via `cancelled_jobs: set()` — `run_job()` verifica a cada 5s no loop de polling
+- **Thread**: `threading.Thread(target=queue_worker, daemon=True)` iniciada no `__main__`
+
+### ⚠️ Mudança de Comportamento vs v4.1
+
+- v4.1 retornava HTTP 429 se havia um job em processamento — **removido**
+- Botão "Gerar Vídeo" não é mais desabilitado automaticamente
+- Jobs novos entram como `"queued"` em vez de `"processing"` diretamente
+
+---
+
 ## [1.0.0] - 2026-02-15
 
 ### ✨ Implementação Inicial Completa

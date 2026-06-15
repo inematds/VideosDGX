@@ -447,8 +447,13 @@ async def home():
         </div>
 
         <div class="jobs-section">
-            <h2 style="color: white; margin-bottom: 20px;">Vídeos</h2>
+            <h2 style="color: white; margin-bottom: 20px;">Vídeos Recentes (da Fila)</h2>
             <div id="jobsList"></div>
+        </div>
+
+        <div class="gallery-section" style="margin-top: 40px;">
+            <h2 style="color: white; margin-bottom: 20px;">📂 Todos os Vídeos (Output)</h2>
+            <div id="allVideos"></div>
         </div>
     </div>
 
@@ -586,9 +591,67 @@ async def home():
             }
         }
 
-        // Auto-atualizar a cada 5 segundos
+        async function loadAllVideos() {
+            try {
+                const response = await fetch('/api/all-videos');
+                const videos = await response.json();
+
+                const container = document.getElementById('allVideos');
+                container.innerHTML = '';
+
+                if (videos.length === 0) {
+                    container.innerHTML = '<div class="job-card"><p style="text-align:center;">Nenhum vídeo encontrado em output/</p></div>';
+                    return;
+                }
+
+                // Criar cards de galeria
+                for (const video of videos) {
+                    const card = document.createElement('div');
+                    card.className = 'job-card';
+                    card.style.cursor = 'pointer';
+
+                    card.innerHTML = `
+                        <div class="job-header">
+                            <div>
+                                <strong>${video.filename}</strong>
+                                <div class="info-text">
+                                    📅 ${video.modified_str} • 💾 ${video.size_mb} MB
+                                </div>
+                            </div>
+                        </div>
+                        <div class="video-player" style="display: none;" id="player-${video.filename}">
+                            <video controls>
+                                <source src="/api/video/${video.filename}" type="video/mp4">
+                            </video>
+                        </div>
+                    `;
+
+                    // Toggle player ao clicar
+                    card.addEventListener('click', (e) => {
+                        const player = document.getElementById(`player-${video.filename}`);
+                        if (player.style.display === 'none') {
+                            player.style.display = 'block';
+                        } else {
+                            player.style.display = 'none';
+                        }
+                    });
+
+                    container.appendChild(card);
+                }
+            } catch (error) {
+                console.error('Erro ao carregar vídeos:', error);
+            }
+        }
+
+        // Auto-atualizar jobs a cada 5 segundos
         setInterval(loadJobs, 5000);
+
+        // Auto-atualizar galeria a cada 10 segundos
+        setInterval(loadAllVideos, 10000);
+
+        // Carregar ao iniciar
         loadJobs();
+        loadAllVideos();
     </script>
 </body>
 </html>
@@ -630,11 +693,33 @@ async def get_jobs():
 
 @app.get("/api/video/{filename}")
 async def get_video(filename: str):
-    """Retorna arquivo de vídeo"""
-    file_path = OUTPUT_DIR / filename
-    if file_path.exists():
+    """Retorna arquivo de vídeo (confinado a OUTPUT_DIR contra path traversal)"""
+    file_path = (OUTPUT_DIR / filename).resolve()
+    if OUTPUT_DIR.resolve() in file_path.parents and file_path.is_file():
         return FileResponse(file_path)
     return JSONResponse(status_code=404, content={"error": "Vídeo não encontrado"})
+
+@app.get("/api/all-videos")
+async def get_all_videos():
+    """Lista todos os vídeos do diretório output"""
+    try:
+        videos = []
+        for video_file in OUTPUT_DIR.glob("*.mp4"):
+            stat = video_file.stat()
+            videos.append({
+                "filename": video_file.name,
+                "size": stat.st_size,
+                "size_mb": round(stat.st_size / (1024 * 1024), 2),
+                "modified": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+                "modified_str": datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+            })
+
+        # Ordenar por data (mais recentes primeiro)
+        videos.sort(key=lambda x: x['modified'], reverse=True)
+
+        return videos
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
 @app.post("/api/restart")
 async def restart():
